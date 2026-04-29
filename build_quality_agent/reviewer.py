@@ -193,20 +193,23 @@ def review(diff: str, model: str = DEFAULT_MODEL) -> Review:
         sampled += f"\n\n[... diff truncated at {MAX_DIFF_BYTES} bytes; "
         sampled += f"original {len(diff)} bytes ...]"
 
-    try:
-        from anthropic import Anthropic
-        client = Anthropic()
-        resp = client.messages.create(
-            model=model,
-            max_tokens=400,
-            messages=[{"role": "user", "content": REVIEW_PROMPT + sampled}],
-        )
-        text = "".join(b.text for b in resp.content if b.type == "text").strip()
-        in_tok = getattr(resp.usage, "input_tokens", 0) if hasattr(resp, "usage") else 0
-        out_tok = getattr(resp.usage, "output_tokens", 0) if hasattr(resp, "usage") else 0
-    except Exception as e:
-        return Review("PASS", f"agent error (degraded): {e}",
+    # v0.4: route LLM call through solo-founder-os AnthropicClient. Token
+    # usage is auto-logged (we still write the BQA-shaped row below for
+    # the verdict + bytes fields cost-audit/funnel don't track).
+    from solo_founder_os.anthropic_client import AnthropicClient
+    client = AnthropicClient(usage_log_path=None)  # we self-log below for richer schema
+    resp, err = client.messages_create(
+        model=model,
+        max_tokens=400,
+        messages=[{"role": "user", "content": REVIEW_PROMPT + sampled}],
+    )
+    if err is not None:
+        return Review("PASS", f"agent error (degraded): {err}",
                       "", len(diff), model=model)
+
+    text = AnthropicClient.extract_text(resp)
+    in_tok = getattr(resp.usage, "input_tokens", 0) if hasattr(resp, "usage") else 0
+    out_tok = getattr(resp.usage, "output_tokens", 0) if hasattr(resp, "usage") else 0
 
     m = re.search(r"VERDICT\s*:\s*(PASS|BLOCK)", text, re.IGNORECASE)
     verdict = m.group(1).upper() if m else "PASS"
