@@ -1,5 +1,7 @@
 # build-quality-agent
 
+**English** | [中文](README.zh-CN.md)
+
 > Claude-powered git pre-push reviewer for indie OSS projects. Stops the bad commit *before* it costs you a Vercel build minute.
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
