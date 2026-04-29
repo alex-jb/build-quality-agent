@@ -22,6 +22,17 @@
 
 就这么简单。不走 CI loop。不会让远端跑 6 分钟才 fail。明显的问题(类型错误、删了 import、硬编码 secret、把 auth check 误删)在你笔记本风扇还没转起来之前就抓到了。
 
+### `--build` 参数(v0.3+)—— 还能真跑一次本地 build
+
+`--build` 在 review 之前先跑一次本地 build(自动识别:JS 用 `npm`/`pnpm`/`bun`/`yarn run build`,Python 用 `python -m build`,Rust `cargo check`,Go `go build`)。build 失败时,build log 会一起塞进 Claude 的 prompt 里给统一解释,而且 push **一定 BLOCK**。
+
+```bash
+build-quality-agent --build              # 单次跑
+BUILD_AGENT_BUILD=1 git push              # 这次 push 默认开启
+```
+
+4 分钟的 build 超时上限够用;大部分独立项目本地 build 30-90 秒。`--build` + diff review 加起来的成本:~$0.0006 + 笔记本 30-60 秒,而远端跑挂一次 = $0.12/min × 6min = **每挡下一次失败的远端 build 省 $0.72**。
+
 ## 安装
 
 ```bash

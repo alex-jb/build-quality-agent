@@ -22,6 +22,17 @@ Before every `git push`, it runs Claude over the diff and decides:
 
 That's the whole pitch. No CI loop. No remote build that fails 6 minutes in. Catches the obvious stuff (type errors, removed imports, hardcoded secrets, reverted auth checks) before your laptop fan even spins up.
 
+### `--build` flag (v0.3+) — also run the actual build
+
+`--build` runs the project's local build before review (auto-detects: `npm`/`pnpm`/`bun`/`yarn run build` for JS, `python -m build`, `cargo check`, `go build`). If the build fails, the build log is appended to the Claude prompt for a unified explanation, and the push is **always BLOCKed**.
+
+```bash
+build-quality-agent --build              # one-off
+BUILD_AGENT_BUILD=1 git push              # default for this push
+```
+
+The 4-minute build cap is generous; most local builds for indie projects are 30-90s. Combined cost of `--build` + diff review: ~$0.0006 + ~30-60s of laptop time, vs ~$0.12/min × 6min = **$0.72 saved per build that would have failed remotely**.
+
 ## Install
 
 ```bash
