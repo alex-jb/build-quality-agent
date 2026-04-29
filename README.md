@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](#)
 [![Model](https://img.shields.io/badge/Claude-Haiku_4.5-D97706?logoColor=white)](https://anthropic.com)
+[![Tests](https://github.com/alex-jb/build-quality-agent/actions/workflows/test.yml/badge.svg)](https://github.com/alex-jb/build-quality-agent/actions/workflows/test.yml)
 
 Built by [Alex Ji](https://github.com/alex-jb) — solo founder shipping [VibeXForge](https://github.com/alex-jb/vibex) and [Orallexa](https://github.com/alex-jb/orallexa-ai-trading-agent). Born from this thought:
 
@@ -61,21 +62,30 @@ python3 -m build_quality_agent --quiet
 
 # Force a specific model
 BUILD_AGENT_MODEL=claude-sonnet-4-6 python3 -m build_quality_agent
+
+# Token + cost report (aggregates ~/.build-quality-agent/usage.jsonl)
+python3 -m build_quality_agent --usage
 ```
 
 ## Design choices
 
 - **Default Haiku 4.5, not Sonnet.** Diff review is a fast cheap task — Haiku gets ~10s response and pennies per push. Sonnet only kicks in if you set `BUILD_AGENT_MODEL`.
 - **PASS by default on any internal failure.** Network down, key missing, Claude flake — the agent prints a warning and lets the push through. Better unverified push than blocking real work.
-- **50kB diff cap.** Beyond this, review quality drops fast. The agent samples the head of the diff and notes the truncation in the prompt.
+- **50kB diff cap, junk paths excluded.** Lockfiles (`package-lock.json`, `bun.lock`, etc.), generated types (`next-env.d.ts`), build output (`.next/`, `dist/`), and binary assets (images, fonts, MP4s) are stripped before review so the budget gets spent on real source.
+- **Vercel-aware prompt.** The agent specifically looks for the patterns that crash Next.js / Vercel builds: missing `default export` on `page.tsx` / `layout.tsx`, client hooks without `"use client"`, server-only imports leaking into client components, undefined symbols, hardcoded secrets.
+- **Reads git's pre-push stdin.** When invoked as a hook, the agent parses the `<local_ref> <local_oid> <remote_ref> <remote_oid>` lines git passes in. That makes the review range exactly match what's being pushed — including new branches without upstream tracking.
 - **No build runner inside the hook.** Running `npm run build` in pre-push would add 5-6 min to every push. Out of scope here. This agent reviews intent + obvious bugs; a separate CI build still catches everything.
+
+## Cost tracking
+
+Every review writes a row to `~/.build-quality-agent/usage.jsonl`. Run `python3 -m build_quality_agent --usage` to see total runs, pass/block split, token counts, and an estimated dollar cost (Haiku 4.5: $1/MTok in, $5/MTok out).
 
 ## Roadmap
 
 - [x] **v0.1** — Pre-push hook · Claude diff review · graceful degradation
-- [ ] **v0.2** — `--build` flag for projects that *want* the slow runtime build
+- [x] **v0.2** — `pip install -e .` portability · git stdin parsing · junk-path filter · Vercel-aware prompt · pytest suite · `--usage` cost report
 - [ ] **v0.3** — Project-specific rule files (`.build-quality-agent.toml`)
-- [ ] **v0.4** — Cost tracker · per-push token report · monthly digest
+- [ ] **v0.4** — `--build` flag for projects that *want* the slow runtime build
 - [ ] **v0.5** — Auto-suggested fix (Claude proposes the smallest patch that would PASS)
 
 ## License
