@@ -5,6 +5,7 @@
 > Claude-powered git pre-push reviewer for indie OSS projects. Stops the bad commit *before* it costs you a Vercel build minute.
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/build-quality-agent.svg)](https://pypi.org/project/build-quality-agent/)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](#)
 [![Model](https://img.shields.io/badge/Claude-Haiku_4.5-D97706?logoColor=white)](https://anthropic.com)
 [![Tests](https://github.com/alex-jb/build-quality-agent/actions/workflows/test.yml/badge.svg)](https://github.com/alex-jb/build-quality-agent/actions/workflows/test.yml)

@@ -5,6 +5,7 @@
 > 给独立开发者的 git pre-push 代码审查工具,Claude 驱动。在烂 commit 烧掉你 Vercel 构建分钟之前先拦下来。
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/build-quality-agent.svg)](https://pypi.org/project/build-quality-agent/)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](#)
 [![Model](https://img.shields.io/badge/Claude-Haiku_4.5-D97706?logoColor=white)](https://anthropic.com)
 [![Tests](https://github.com/alex-jb/build-quality-agent/actions/workflows/test.yml/badge.svg)](https://github.com/alex-jb/build-quality-agent/actions/workflows/test.yml)
