@@ -1,6 +1,6 @@
 [project]
 name = "build-quality-agent"
-version = "0.4.0"
+version = "0.5.0"
 description = "Claude-powered git pre-push diff reviewer for indie OSS projects."
 authors = [{ name = "Alex Ji", email = "alex@vibexforge.com" }]
 license = { text = "MIT" }
@@ -26,12 +26,12 @@ classifiers = [
 keywords = ["git-hook", "pre-push", "code-review", "claude", "anthropic", "indie"]
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=8.0",
-]
+mcp = ["mcp>=1.0"]
+dev = ["pytest>=8.0", "mcp>=1.0"]
 
 [project.scripts]
 build-quality-agent = "build_quality_agent.__main__:main"
+build-quality-mcp = "build_quality_agent.mcp_server:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -102,6 +102,29 @@ Every review writes a row to `~/.build-quality-agent/usage.jsonl`. Run `python3 
 - [ ] **v0.4** — `--build` flag for projects that *want* the slow runtime build
 - [ ] **v0.5** — Auto-suggested fix (Claude proposes the smallest patch that would PASS)
 
+## MCP server (Claude Desktop / Cursor / Zed)
+
+Review a diff inline from your AI assistant.
+
+```bash
+pip install 'build-quality-agent[mcp]'
+```
+
+Then in `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "build-quality": {
+      "command": "build-quality-mcp",
+      "env": { "ANTHROPIC_API_KEY": "..." }
+    }
+  }
+}
+```
+
+Tools: `review_diff(diff)` · `review_range(diff_range)` · `usage_summary()`
+
 ## License
 
 MIT.

@@ -102,6 +102,29 @@ python3 -m build_quality_agent --usage
 - [ ] **v0.4** —— `--build` 选项给那些*确实想*跑 build 的项目
 - [ ] **v0.5** —— 自动建议补丁(Claude 提出最小补丁让 BLOCK 变 PASS)
 
+## MCP server(Claude Desktop / Cursor / Zed)
+
+让 AI 助手直接帮你 review diff。
+
+```bash
+pip install 'build-quality-agent[mcp]'
+```
+
+写到 `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "build-quality": {
+      "command": "build-quality-mcp",
+      "env": { "ANTHROPIC_API_KEY": "..." }
+    }
+  }
+}
+```
+
+工具:`review_diff(diff)` · `review_range(diff_range)` · `usage_summary()`
+
 ## 协议
 
 MIT。
