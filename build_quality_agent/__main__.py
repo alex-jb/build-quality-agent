@@ -72,7 +72,12 @@ def main(argv: list[str] | None = None) -> int:
                         "Claude review for a unified explanation.")
     p.add_argument("--build-timeout", type=int, default=240,
                    help="Build timeout in seconds (default 240)")
-    args = p.parse_args(argv)
+    # parse_known_args (not parse_args) so positional args git's pre-push
+    # hook injects (`<remote> <url>`) are silently dropped instead of
+    # causing argparse to bail. The hook contract is: refs come on stdin,
+    # not argv. Without this, every `git push` errors with
+    # "unrecognized arguments: origin https://..."
+    args, _ignored = p.parse_known_args(argv)
 
     if args.usage:
         print(usage_report())
