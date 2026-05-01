@@ -232,6 +232,21 @@ def review(diff: str, model: str = DEFAULT_MODEL) -> Review:
                         signal=f"BLOCK: {reason[:200]}")
         except Exception:
             pass
+    else:
+        # PASS verdicts feed the L3 skill library — what does a "good
+        # review of a clean diff" look like across many runs? Record
+        # only structural signals (length, model), not the diff itself
+        # (it may contain secrets in transit even if not committed).
+        try:
+            from solo_founder_os import record_example
+            record_example(
+                "review-diff-pass",
+                inputs={"diff_bytes": len(diff), "model": model},
+                output=f"VERDICT: PASS\nREASON: {reason[:200]}",
+                note=f"Claude PASS verdict, {in_tok}+{out_tok} tokens",
+            )
+        except Exception:
+            pass
 
     return r
 
