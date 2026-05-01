@@ -219,6 +219,20 @@ def review(diff: str, model: str = DEFAULT_MODEL) -> Review:
     r = Review(verdict, reason, text, len(diff),
                input_tokens=in_tok, output_tokens=out_tok, model=model)
     _log_usage(r)
+
+    # Reflexion log: BLOCK verdicts mean the agent stopped a sloppy push.
+    # Logging this teaches future reviews what kinds of issues we keep
+    # making. Best-effort — wrapped in a try/import so older
+    # solo-founder-os versions don't break this hot path.
+    if verdict == "BLOCK":
+        try:
+            from solo_founder_os import log_outcome
+            log_outcome(".build-quality-agent", task="review_diff",
+                        outcome="FAILED",
+                        signal=f"BLOCK: {reason[:200]}")
+        except Exception:
+            pass
+
     return r
 
 
