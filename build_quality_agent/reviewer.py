@@ -6,7 +6,7 @@ import pathlib
 import re
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 # Per Anthropic — Haiku 4.5 is fast + cheap, good enough for diff review.
@@ -293,7 +293,7 @@ def usage_report() -> str:
             m["cost"] += cost
 
     out = []
-    out.append(f"build-quality-agent — usage report")
+    out.append("build-quality-agent — usage report")
     out.append(f"  {total['runs']} runs · {total['pass']} pass · {total['block']} block")
     out.append(f"  {total['in']:,} input tokens · {total['out']:,} output tokens")
     out.append(f"  ~${total['cost']:.4f} total")
